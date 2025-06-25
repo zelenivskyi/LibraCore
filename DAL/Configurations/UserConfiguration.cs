@@ -21,7 +21,7 @@ namespace DAL.Configurations
 
             builder.Property(u => u.PhoneNumber)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(100);
 
             builder.Property(u => u.Password)
                 .IsRequired()
@@ -43,9 +43,6 @@ namespace DAL.Configurations
                 .WithOne(r => r.User)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasIndex(u => u.PhoneNumber)
-                .IsUnique();
         }
     }
 }

@@ -23,7 +23,7 @@ namespace DAL.Configurations
                 .HasMaxLength(2000)
                 .IsRequired();
 
-            builder.Property(b => b.PublishedYear)
+            builder.Property(b => b.PublishedDate)
                 .IsRequired();
 
             builder.Property(b => b.Pages)
