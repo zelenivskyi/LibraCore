@@ -1,0 +1,19 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using DAL.Entities;
+
+namespace DAL.Generic_Repository.Interfaces
+{
+    public interface IBookRepository : IGenericRepository<Book>
+    {
+        Task<List<Book>> GetBooksByAuthorIdAsync(int authorId);
+        Task<List<Book>> GetBooksByGenreIdAsync(int genreId);
+        Task<List<Book>> GetLatestBooksAsync(int count);
+        Task<List<Book>> GetPagedBooksAsync(int pageNumber, int pageSize);
+        Task<int> GetTotalBooksCountAsync();
+        Task<List<Book>> GetAllWithDetailsAsync();
+    }
+}
