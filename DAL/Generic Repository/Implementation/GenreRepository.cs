@@ -19,8 +19,8 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<Dictionary<string, int>> GetGenresWithBooksCountAsync()
         {
             return await dbSet
-                .Select(g => new { g.Name, BooksCount = g.Books.Count })
-                .ToDictionaryAsync(x => x.Name, x => x.BooksCount);
+                .Select(genre => new { genre.Name, BooksCount = genre.Books.Count })
+                .ToDictionaryAsync(genre => genre.Name, genre => genre.BooksCount);
         }
     }
 

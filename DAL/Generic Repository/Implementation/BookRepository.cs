@@ -18,27 +18,27 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<List<Book>> GetBooksByAuthorIdAsync(int authorId)
         {
             return await dbSet
-                .Where(b => b.AuthorId == authorId)
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
+                .Where(book => book.AuthorId == authorId)
+                .Include(book => book.Author)
+                .Include(book => book.Genre)
                 .ToListAsync();
         }
 
         public async Task<List<Book>> GetBooksByGenreIdAsync(int genreId)
         {
             return await dbSet
-                .Where(b => b.GenreId == genreId)
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
+                .Where(book => book.GenreId == genreId)
+                .Include(book => book.Author)
+                .Include(book => book.Genre)
                 .ToListAsync();
         }
 
         public async Task<List<Book>> GetLatestBooksAsync(int count)
         {
             return await dbSet
-                .OrderByDescending(b => b.PublishedDate)
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
+                .OrderByDescending(book => book.PublishedDate)
+                .Include(book => book.Author)
+                .Include(book => book.Genre)
                 .Take(count)
                 .ToListAsync();
         }
@@ -46,12 +46,12 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<List<Book>> GetPagedBooksAsync(int pageNumber, int pageSize)
         {
             return await dbSet
-                .OrderBy(b => b.Id)
+                .OrderBy(book => book.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
-            .ToListAsync();
+                .Include(book => book.Author)
+                .Include(book => book.Genre)
+                .ToListAsync();
         }
 
         public async Task<int> GetTotalBooksCountAsync()
@@ -62,10 +62,10 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<List<Book>> GetAllWithDetailsAsync()
         {
             return await dbSet
-                .Include(b => b.Author)
-                .Include(b => b.Genre)
-                .Include(b => b.Reservations)
-                .Include(b => b.Reviews)
+                .Include(book => book.Author)
+                .Include(book => book.Genre)
+                .Include(book => book.Reservations)
+                .Include(book => book.Reviews)
                 .ToListAsync();
         }
     }

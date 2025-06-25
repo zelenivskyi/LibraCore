@@ -19,25 +19,25 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<List<Reservation>> GetReservationsByUserIdAsync(int userId)
         {
             return await dbSet
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.Reservations)
-                .Include(r => r.Book)
+                .Where(user => user.Id == userId)
+                .SelectMany(user => user.Reservations)
+                .Include(book => book.Book)
                 .ToListAsync();
         }
 
         public async Task<List<Review>> GetReviewsByUserIdAsync(int userId)
         {
             return await dbSet
-                .Where(u => u.Id == userId)
-                .SelectMany(u => u.Reviews)
-                .Include(r => r.Book)
+                .Where(user => user.Id == userId)
+                .SelectMany(user => user.Reviews)
+                .Include(book => book.Book)
                 .ToListAsync();
         }
 
         public async Task<List<User>> GetPagedUsersAsync(int pageNumber, int pageSize)
         {
             return await dbSet
-                .OrderBy(u => u.Id)
+                .OrderBy(user => user.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

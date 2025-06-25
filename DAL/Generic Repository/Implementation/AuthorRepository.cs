@@ -18,14 +18,14 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<Dictionary<string, int>> GetAuthorsWithBooksCountAsync()
         {
             return await dbSet
-                .Select(a => new { a.FullName, BooksCount = a.Books.Count })
-                .ToDictionaryAsync(x => x.FullName, x => x.BooksCount);
+                .Select(author => new { author.FullName, BooksCount = author.Books.Count })
+                .ToDictionaryAsync(author => author.FullName, author => author.BooksCount);
         }
 
         public async Task<List<Author>> GetPagedAuthorsAsync(int pageNumber, int pageSize)
         {
             return await dbSet
-                .OrderBy(a => a.Id) 
+                .OrderBy(author => author.Id) 
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
