@@ -1,5 +1,7 @@
 ﻿using BLL.DTO.Reservation;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
 using DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 
@@ -108,11 +110,27 @@ namespace API.Controllers
         }
 
 
-        // [HttpGet("paged")]
-        // public async Task<ActionResult<List<ReservationReadDto>>> GetPaged([FromQuery] int pageNumber, [FromQuery] int pageSize)
-        // {
-        //     List<ReservationReadDto> reservations = await _reservationService.GetPagedReservationsAsync(pageNumber, pageSize);
-        //     return Ok(reservations);
-        // }
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedList<ReservationReadDto>>> GetPagedReservations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var pagedReservations = await reservationService.GetPagedReservationsAsync(pageNumber, pageSize);
+            return Ok(pagedReservations);
+        }
+
+        [HttpGet("filter")]
+        public async Task<ActionResult<PagedList<ReservationReadDto>>> GetFilteredReservations([FromQuery] ReservationFilterDto filterDto,[FromQuery] int pageNumber = 1,[FromQuery] int pageSize = 10)
+        {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+
+            PagedList<ReservationReadDto> filteredReservations = await reservationService.GetFilteredReservationsAsync(filterDto, pageNumber, pageSize);
+            return Ok(filteredReservations);
+        }
     }
 }

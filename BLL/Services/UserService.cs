@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BLL.DTO.User;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
 using DAL.Entities;
 using DAL.UOW;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services
 {
@@ -121,14 +124,119 @@ namespace BLL.Services
             return true;
         }
 
-        private async Task<List<User>> GetPagedUsersAsync(int pageNumber, int pageSize)
+        public async Task<PagedList<UserReadDto>> GetPagedUsersAsync(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            List<User> users = await unitOfWork.Users.GetPagedUsersAsync(pageNumber, pageSize);
+            int totalCount = await unitOfWork.Users.GetTotalUsersCountAsync();
+            List<UserReadDto> dtos = new List<UserReadDto>();
+
+            foreach (User user in users)
+            {
+                UserReadDto dto = new UserReadDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = user.Role,
+                    RegisteredAt = user.RegisteredAt.ToUniversalTime()
+                };
+                dtos.Add(dto);
+            }
+
+            return new PagedList<UserReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
-        private async Task<int> GetTotalUsersCountAsync()
+        public async Task<PagedList<UserReadDto>> GetFilteredUsersAsync(UserFilterDto filterDto, int pageNumber, int pageSize)
         {
-            return await unitOfWork.Users.GetTotalUsersCountAsync();
+            IQueryable<User> query = unitOfWork.Users.GetQueryable();
+
+            if (!string.IsNullOrEmpty(filterDto.FullName))
+            {
+                string fullNameFilter = filterDto.FullName.ToLower().Trim();
+                query = query.Where(u => u.FullName.ToLower().Contains(fullNameFilter));
+            }
+
+            if (!string.IsNullOrEmpty(filterDto.PhoneNumber))
+            {
+                string phoneFilter = filterDto.PhoneNumber.ToLower().Trim();
+                query = query.Where(u => u.PhoneNumber.ToLower().Contains(phoneFilter));
+            }
+
+            if (!string.IsNullOrEmpty(filterDto.Role))
+            {
+                string roleFilter = filterDto.Role.ToLower().Trim();
+                query = query.Where(u => u.Role.ToLower().Contains(roleFilter));
+            }
+            string? sortBy = filterDto.SortBy?.ToLower().Trim();
+            
+            if (string.IsNullOrEmpty(sortBy) || sortBy == "id")
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(u => u.Id);
+                }
+                else
+                {
+                    query = query.OrderBy(u => u.Id);
+                }
+            }
+            else if (sortBy == "fullname")
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(u => u.FullName);
+                }
+                else
+                {
+                    query = query.OrderBy(u => u.FullName);
+                }
+            }
+            else if (sortBy == "registeredat")
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(u => u.RegisteredAt);
+                }
+                else
+                {
+                    query = query.OrderBy(u => u.RegisteredAt);
+                }
+            }
+            else
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(u => u.Id);
+                }
+                else
+                {
+                    query = query.OrderBy(u => u.Id);
+                }
+            }
+
+            int totalCount = await query.CountAsync();
+
+            List<User> users = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            List<UserReadDto> dtos = new List<UserReadDto>();
+
+            foreach (User user in users)
+            {
+                UserReadDto dto = new UserReadDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
+                    Role = user.Role,
+                    RegisteredAt = user.RegisteredAt.ToUniversalTime()
+                };
+                dtos.Add(dto);
+            }
+
+            return new PagedList<UserReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
         public async Task<UserReadDto> CreateAdminAsync(UserCreateDto dto)

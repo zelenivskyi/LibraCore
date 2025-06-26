@@ -1,5 +1,8 @@
 ﻿using BLL.DTO.User;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
+using BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -8,24 +11,24 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private IUserService userService;
 
         public UserController(IUserService userService)
         {
-            _userService = userService;
+            this.userService = userService;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<UserReadDto>>> GetAll()
         {
-            List<UserReadDto> users = await _userService.GetAllAsync();
+            List<UserReadDto> users = await userService.GetAllAsync();
             return Ok(users);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            UserReadDto user = await _userService.GetByIdAsync(id);
+            UserReadDto user = await userService.GetByIdAsync(id);
             if (user == null)
             {
                 return NotFound(new { message = $"User with ID {id} not found" });
@@ -36,21 +39,21 @@ namespace API.Controllers
         [HttpPost("create/librarian")]
         public async Task<IActionResult> CreateLibrarian([FromBody] UserCreateDto dto)
         {
-            UserReadDto createdUser = await _userService.CreateLibrarianAsync(dto);
+            UserReadDto createdUser = await userService.CreateLibrarianAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
         }
 
         [HttpPost("create/admin")]
         public async Task<IActionResult> CreateAdmin([FromBody] UserCreateDto dto)
         {
-            UserReadDto createdUser = await _userService.CreateAdminAsync(dto);
+            UserReadDto createdUser = await userService.CreateAdminAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = createdUser.Id }, createdUser);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserUpdateDto dto)
         {
-            UserReadDto updatedUser = await _userService.UpdateAsync(id, dto);
+            UserReadDto updatedUser = await userService.UpdateAsync(id, dto);
             if (updatedUser == null)
             {
                 return NotFound(new { message = $"User with ID {id} not found" });
@@ -58,10 +61,34 @@ namespace API.Controllers
             return Ok(new { message = "User updated successfully" });
         }
 
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedList<UserReadDto>>> GetPagedUsers([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var pagedUsers = await userService.GetPagedUsersAsync(pageNumber, pageSize);
+            return Ok(pagedUsers);
+        }
+
+        [HttpGet("filter")]
+        public async Task<ActionResult<PagedList<UserReadDto>>> GetFilteredUsers([FromQuery] UserFilterDto filterDto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+
+            PagedList<UserReadDto> filteredUsers = await userService.GetFilteredUsersAsync(filterDto, pageNumber, pageSize);
+            return Ok(filteredUsers);
+        }
+
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            bool isDeleted = await _userService.DeleteAsync(id);
+            bool isDeleted = await userService.DeleteAsync(id);
             if (isDeleted == false)
             {
                 return NotFound(new { message = $"User with ID {id} not found" });

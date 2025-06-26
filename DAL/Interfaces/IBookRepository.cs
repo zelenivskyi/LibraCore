@@ -15,6 +15,7 @@ namespace DAL.Generic_Repository.Interfaces
         Task<List<Book>> GetLatestBooksAsync(int count);
         Task<List<Book>> GetPagedBooksAsync(int pageNumber, int pageSize);
         Task<int> GetTotalBooksCountAsync();
+        IQueryable<Book> GetQueryable();
         Task<List<Book>> GetAllWithDetailsAsync();
     }
 }

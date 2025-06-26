@@ -12,5 +12,6 @@ namespace DAL.Generic_Repository.Interfaces
         Task<Dictionary<string, int>> GetAuthorsWithBooksCountAsync();
         Task<List<Author>> GetPagedAuthorsAsync(int pageNumber, int pageSize);
         Task<int> GetTotalAuthorsCountAsync();
+        IQueryable<Author> GetQueryable();
     }
 }

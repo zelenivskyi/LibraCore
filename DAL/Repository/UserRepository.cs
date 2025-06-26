@@ -16,6 +16,11 @@ namespace DAL.Implementation
 
         }
 
+        public IQueryable<User> GetQueryable()
+        {
+            return dbSet.AsQueryable();
+        }
+
         public async Task<List<Reservation>> GetReservationsByUserIdAsync(int userId)
         {
             return await dbSet

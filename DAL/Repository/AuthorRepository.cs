@@ -13,6 +13,11 @@ namespace DAL.Implementation
     {
         public AuthorRepository(DbContext context) : base(context)
         {
+
+        }
+        public IQueryable<Author> GetQueryable()
+        {
+            return dbSet.AsQueryable();
         }
 
         public async Task<Dictionary<string, int>> GetAuthorsWithBooksCountAsync()
@@ -25,7 +30,7 @@ namespace DAL.Implementation
         public async Task<List<Author>> GetPagedAuthorsAsync(int pageNumber, int pageSize)
         {
             return await dbSet
-                .OrderBy(author => author.Id) 
+                .OrderBy(author => author.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();

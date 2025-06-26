@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BLL.DTO.Book;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
 using DAL.Entities;
 using DAL.UOW;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services
 {
@@ -219,14 +222,124 @@ namespace BLL.Services
             await unitOfWork.SaveChangesAsync();
         }
 
-        public Task<List<BookReadDto>> GetPagedBooksAsync(int pageNumber, int pageSize)
+        public async Task<PagedList<BookReadDto>> GetPagedBooksAsync(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            List<Book> books = await unitOfWork.Books.GetPagedBooksAsync(pageNumber, pageSize);
+            int totalCount = await unitOfWork.Books.GetTotalBooksCountAsync();
+            List<BookReadDto> dtos = new List<BookReadDto>();
+
+            foreach (Book book in books)
+            {
+                BookReadDto bookReadDto = new BookReadDto
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Description = book.Description,
+                    PublishedDate = book.PublishedDate.ToUniversalTime(),
+                    Pages = book.Pages,
+                    Photo = book.Photo,
+                    GenreId = book.GenreId,
+                    GenreName = book.Genre.Name,
+                    AuthorId = book.AuthorId,
+                    AuthorName = book.Author.FullName
+                };
+                dtos.Add(bookReadDto);
+            }
+
+            return new PagedList<BookReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
-        private async Task<int> GetTotalBooksCountAsync()
+        public async Task<PagedList<BookReadDto>> GetFilteredBooksAsync(BookFilterDto filter, int pageNumber, int pageSize)
         {
-            return await unitOfWork.Books.GetTotalBooksCountAsync();
+            IQueryable<Book> query = unitOfWork.Books.GetQueryable();
+            if (!string.IsNullOrEmpty(filter.Title))
+            {
+                string title = filter.Title.ToLower().Trim();
+                query = query.Where(b => b.Title.ToLower().Contains(title));
+            }
+            if (filter.GenreId.HasValue)
+            {
+                int genreId = filter.GenreId.Value;
+                query = query.Where(b => b.GenreId == genreId);
+            }
+            if (filter.AuthorId.HasValue)
+            {
+                int authorId = filter.AuthorId.Value;
+                query = query.Where(b => b.AuthorId == authorId);
+            }
+
+            if (!string.IsNullOrEmpty(filter.SortBy))
+            {
+                string sortBy = filter.SortBy.ToLower().Trim();
+
+                if (sortBy == "title")
+                {
+                    if (filter.SortDescending)
+                    {
+                        query = query.OrderByDescending(b => b.Title.ToLower().Trim());
+                    }
+                    else
+                    {
+                        query = query.OrderBy(b => b.Title.ToLower().Trim());
+                    }
+                }
+                else if (sortBy == "publisheddate")
+                {
+                    if (filter.SortDescending)
+                    {
+                        query = query.OrderByDescending(b => b.PublishedDate);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(b => b.PublishedDate);
+                    }
+                }
+                else
+                {
+                    if (filter.SortDescending)
+                    {
+                        query = query.OrderByDescending(b => b.Id);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(b => b.Id);
+                    }
+                }
+            }
+            else
+            {
+                query = query.OrderBy(b => b.Id);
+            }
+            int totalCount = await query.CountAsync();
+
+            List<Book> books = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Include(p => p.Genre)
+                .Include(p => p.Author)
+                .Take(pageSize)
+                .ToListAsync();
+
+            List<BookReadDto> dtos = new List<BookReadDto>();
+
+            foreach (Book book in books)
+            {
+                BookReadDto dto = new BookReadDto
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Description = book.Description,
+                    PublishedDate = book.PublishedDate.ToUniversalTime(),
+                    Pages = book.Pages,
+                    Photo = book.Photo,
+                    GenreId = book.GenreId,
+                    GenreName = book.Genre.Name,
+                    AuthorId = book.AuthorId,
+                    AuthorName = book.Author.FullName
+                };
+                dtos.Add(dto);
+            }
+
+            return new PagedList<BookReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
     }
 }

@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BLL.Filters
+{
+    public class BookFilterDto
+    {
+        public string Title { get; set; } = string.Empty;
+        public int? GenreId { get; set; }
+        public int? AuthorId { get; set; }
+        public string SortBy { get; set; } = string.Empty;
+        public bool SortDescending { get; set; } = false;
+    }
+}

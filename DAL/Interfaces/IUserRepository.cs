@@ -9,6 +9,7 @@ namespace DAL.Generic_Repository.Interfaces
 {
     public interface IUserRepository : IGenericRepository<User>
     {
+        IQueryable<User> GetQueryable();
         Task<List<Reservation>> GetReservationsByUserIdAsync(int userId);
         Task<List<Review>> GetReviewsByUserIdAsync(int userId);
         Task<List<User>> GetPagedUsersAsync(int pageNumber, int pageSize);

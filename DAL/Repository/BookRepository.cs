@@ -15,6 +15,11 @@ namespace DAL.Implementation
         {
 
         }
+
+        public IQueryable<Book> GetQueryable()
+        {
+            return dbSet.AsQueryable();
+        }
         public async Task<List<Book>> GetBooksByAuthorIdAsync(int authorId)
         {
             return await dbSet

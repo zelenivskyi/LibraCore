@@ -1,5 +1,8 @@
 ﻿using BLL.DTO.Book;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
+using BLL.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -8,24 +11,24 @@ namespace API.Controllers
     [Route("api/book")]
     public class BookController : ControllerBase
     {
-        private readonly IBookService _bookService;
+        private IBookService bookService;
 
         public BookController(IBookService bookService)
         {
-            _bookService = bookService;
+            this.bookService = bookService;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<BookReadDto>>> GetAll()
         {
-            List<BookReadDto> books = await _bookService.GetAllAsync();
+            List<BookReadDto> books = await bookService.GetAllAsync();
             return Ok(books);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            BookReadDto book = await _bookService.GetByIdAsync(id);
+            BookReadDto book = await bookService.GetByIdAsync(id);
             if (book == null)
             {
                 return NotFound(new { message = $"Book with ID {id} not found" });
@@ -37,7 +40,7 @@ namespace API.Controllers
         [HttpGet("by-author/{authorId}")]
         public async Task<ActionResult<List<BookReadDto>>> GetByAuthorId(int authorId)
         {
-            List<BookReadDto> books = await _bookService.GetBooksByAuthorIdAsync(authorId);
+            List<BookReadDto> books = await bookService.GetBooksByAuthorIdAsync(authorId);
             if(books.Count == 0)
             {
                 return Ok(new { message = "This author doesn`t have any book" });
@@ -49,7 +52,7 @@ namespace API.Controllers
         [HttpGet("by-genre/{genreId}")]
         public async Task<ActionResult<List<BookReadDto>>> GetByGenreId(int genreId)
         {
-            List<BookReadDto> books = await _bookService.GetBooksByGenreIdAsync(genreId);
+            List<BookReadDto> books = await bookService.GetBooksByGenreIdAsync(genreId);
             if (books.Count == 0)
             {
                 return Ok(new { message = "Cannot find any book with this genre ID" });
@@ -61,14 +64,14 @@ namespace API.Controllers
         [HttpGet("latest/{count}")]
         public async Task<ActionResult<List<BookReadDto>>> GetLatestBooks(int count)
         {
-            List<BookReadDto> books = await _bookService.GetLatestBooksAsync(count);
+            List<BookReadDto> books = await bookService.GetLatestBooksAsync(count);
             return Ok(books);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] BookCreateDto dto)
         {
-            BookReadDto createdBook = await _bookService.CreateAsync(dto);
+            BookReadDto createdBook = await bookService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
         }
 
@@ -77,7 +80,7 @@ namespace API.Controllers
         {
             try
             {
-                await _bookService.UpdateAsync(id, dto);
+                await bookService.UpdateAsync(id, dto);
                 return Ok(new { message = "Book updated successfully" });
             }
             catch (Exception ex)
@@ -91,7 +94,7 @@ namespace API.Controllers
         {
             try
             {
-                await _bookService.DeleteAsync(id);
+                await bookService.DeleteAsync(id);
                 return Ok(new { message = "Book deleted successfully" });
             }
             catch (Exception ex)
@@ -100,11 +103,28 @@ namespace API.Controllers
             }
         }
 
-        //[HttpGet("paged")]
-        //public async Task<ActionResult<List<BookReadDto>>> GetPaged([FromQuery] int pageNumber, [FromQuery] int pageSize)
-        //{
-        //    List<BookReadDto> books = await _bookService.GetPagedBooksAsync(pageNumber, pageSize);
-        //    return Ok(books);
-        //}
+        [HttpGet("filter")]
+        public async Task<ActionResult<PagedList<BookReadDto>>> GetFiltered([FromQuery] BookFilterDto filterDto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+
+            PagedList<BookReadDto> filteredBooks = await bookService.GetFilteredBooksAsync(filterDto, pageNumber, pageSize);
+            return Ok(filteredBooks);
+        }
+
+
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedList<BookReadDto>>> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            PagedList<BookReadDto> pagedBooks = await bookService.GetPagedBooksAsync(pageNumber, pageSize);
+            return Ok(pagedBooks);
+        }
     }
 }

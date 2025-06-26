@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BLL.DTO.Author;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
 using DAL.Entities;
 using DAL.UOW;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services
 {
@@ -58,14 +61,26 @@ namespace BLL.Services
             return list;
         }
 
-        public Task<List<AuthorReadDto>> GetPagedAuthorsAsync(int pageNumber, int pageSize)
+        public async Task<PagedList<AuthorReadDto>> GetPagedAuthorsAsync(int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
-        }
+            List<Author> authors = await unitOfWork.Authors.GetPagedAuthorsAsync(pageNumber, pageSize);
+            int totalCount = await unitOfWork.Authors.GetTotalAuthorsCountAsync();
+            List<AuthorReadDto> dtos = new List<AuthorReadDto>();
 
-        private async Task<int> GetTotalAuthorsCountAsync()
-        {
-            return await unitOfWork.Authors.GetTotalAuthorsCountAsync();
+            foreach (Author author in authors)
+            {
+                AuthorReadDto dto = new AuthorReadDto
+                {
+                    Id = author.Id,
+                    FullName = author.FullName,
+                    BirthDate = author.BirthDate.ToUniversalTime(),
+                    Country = author.Country,
+                    Biography = author.Biography
+                };
+                dtos.Add(dto);
+            }
+
+            return new PagedList<AuthorReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
         public async Task<Dictionary<string, int>> GetAuthorsWithBooksCountAsync()
@@ -124,6 +139,86 @@ namespace BLL.Services
 
             unitOfWork.Authors.Delete(author);
             await unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<PagedList<AuthorReadDto>> GetFilteredAuthorsAsync(AuthorFilterDto filterDto, int pageNumber, int pageSize)
+        {
+            IQueryable<Author> query = unitOfWork.Authors.GetQueryable();
+            if (!string.IsNullOrEmpty(filterDto.FullName))
+            {
+                string name = filterDto.FullName.ToLower().Trim();
+                query = query.Where(a => a.FullName.ToLower().Contains(name));
+            }
+            if (!string.IsNullOrEmpty(filterDto.Country))
+            {
+                string country = filterDto.Country.ToLower().Trim();
+                query = query.Where(a => a.Country.ToLower().Contains(country));
+            }
+
+            if (!string.IsNullOrEmpty(filterDto.SortBy))
+            {
+                string sortBy = filterDto.SortBy.ToLower().Trim();
+
+                if (sortBy == "fullname")
+                {
+                    if (filterDto.SortDescending)
+                    {
+                        query = query.OrderByDescending(a => a.FullName);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(a => a.FullName);
+                    }
+                }
+                else if (sortBy == "country")
+                {
+                    if (filterDto.SortDescending)
+                    {
+                        query = query.OrderByDescending(a => a.Country);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(a => a.Country);
+                    }
+                }
+                else
+                {
+                    if (filterDto.SortDescending)
+                    {
+                        query = query.OrderByDescending(a => a.Id);
+                    }
+                    else
+                    {
+                        query = query.OrderBy(a => a.Id);
+                    }
+                }
+            }
+            else
+            {
+                query = query.OrderBy(a => a.Id);
+            }
+
+            int totalCount = await query.CountAsync();
+            List<Author> authors = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            List<AuthorReadDto> result = new List<AuthorReadDto>();
+            foreach (Author author in authors)
+            {
+                AuthorReadDto dto = new AuthorReadDto
+                {
+                    Id = author.Id,
+                    FullName = author.FullName,
+                    BirthDate = author.BirthDate.ToUniversalTime(),
+                    Country = author.Country,
+                    Biography = author.Biography
+                };
+                result.Add(dto);
+            }
+
+            return new PagedList<AuthorReadDto>(result, totalCount, pageNumber, pageSize);
         }
     }
 }

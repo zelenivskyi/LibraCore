@@ -1,5 +1,7 @@
 ﻿using BLL.DTO.Author;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -76,11 +78,36 @@ namespace API.Controllers
             return Ok(data);
         }
 
-        //[HttpGet("paged")]
-        //public async Task<ActionResult<List<AuthorReadDto>>> GetPaged([FromQuery] int pageNumber, [FromQuery] int pageSize)
-        //{
-        //    var authors = await _authorService.GetPagedAuthorsAsync(pageNumber, pageSize);
-        //    return Ok(authors);
-        //}
+        [HttpGet("paged")]
+        public async Task<ActionResult<PagedList<AuthorReadDto>>> GetPaged([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+
+            PagedList<AuthorReadDto> pagedAuthors = await authorService.GetPagedAuthorsAsync(pageNumber, pageSize);
+            return Ok(pagedAuthors);
+        }
+
+        [HttpGet("filtered")]
+        public async Task<ActionResult<PagedList<AuthorReadDto>>> GetFilteredAuthors([FromQuery] AuthorFilterDto filterDto, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            if (pageNumber < 1)
+            {
+                pageNumber = 1;
+            }
+            if (pageSize < 1)
+            {
+                pageSize = 10;
+            }
+
+            PagedList<AuthorReadDto> pagedAuthors = await authorService.GetFilteredAuthorsAsync(filterDto, pageNumber, pageSize);
+            return Ok(pagedAuthors);
+        }
     }
 }

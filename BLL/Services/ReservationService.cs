@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BLL.DTO.Reservation;
+using BLL.Filters;
 using BLL.Interfaces;
+using BLL.Paginate;
 using DAL.Entities;
 using DAL.UOW;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services
 {
@@ -225,15 +228,132 @@ namespace BLL.Services
             return result;
         }
 
-        public async Task<List<ReservationReadDto>> GetPagedReservationsAsync(int pageNumber, int pageSize)
+        public async Task<PagedList<ReservationReadDto>> GetFilteredReservationsAsync(ReservationFilterDto filterDto, int pageNumber, int pageSize)
         {
-            throw new NotImplementedException();
+            IQueryable<Reservation> query = unitOfWork.Reservations.GetQueryable();
+
+            if (!string.IsNullOrEmpty(filterDto.Status))
+            {
+                string statusFilter = filterDto.Status.ToLower().Trim();
+                query = query.Where(r => r.Status.ToLower().Contains(statusFilter));
+            }
+            if (filterDto.UserId.HasValue)
+            {
+                query = query.Where(r => r.UserId == filterDto.UserId.Value);
+            }
+            if (filterDto.BookId.HasValue)
+            {
+                query = query.Where(r => r.BookId == filterDto.BookId.Value);
+            }
+            if (filterDto.ReservedFrom.HasValue)
+            {
+                query = query.Where(r => r.ReservedAt >= filterDto.ReservedFrom.Value);
+            }
+            if (filterDto.ReservedTo.HasValue)
+            {
+                query = query.Where(r => r.ReservedAt <= filterDto.ReservedTo.Value);
+            }
+            string? sortBy = filterDto.SortBy?.ToLower().Trim();
+
+            if (string.IsNullOrEmpty(sortBy) || sortBy == "id")
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(r => r.Id);
+                }
+                else
+                {
+                    query = query.OrderBy(r => r.Id);
+                }
+            }
+            else if (sortBy == "status")
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(r => r.Status);
+                }
+                else
+                {
+                    query = query.OrderBy(r => r.Status);
+                }
+            }
+            else if (sortBy == "reservedat")
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(r => r.ReservedAt);
+                }
+                else
+                {
+                    query = query.OrderBy(r => r.ReservedAt);
+                }
+            }
+            else
+            {
+                if (filterDto.SortDescending)
+                {
+                    query = query.OrderByDescending(r => r.Id);
+                }
+                else
+                {
+                    query = query.OrderBy(r => r.Id);
+                }
+            }
+
+            int totalCount = await query.CountAsync();
+
+            List<Reservation> reservations = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Include(r => r.User)  
+                .Include(r => r.Book) 
+                .ToListAsync();
+
+            List<ReservationReadDto> dtos = new List<ReservationReadDto>();
+
+            foreach (Reservation reservation in reservations)
+            {
+                ReservationReadDto dto = new ReservationReadDto
+                {
+                    Id = reservation.Id,
+                    UserId = reservation.UserId,
+                    UserFullName = reservation.User.FullName,
+                    BookId = reservation.BookId,
+                    BookTitle = reservation.Book.Title,
+                    ReservedAt = reservation.ReservedAt.ToUniversalTime(),
+                    ReturnedAt = reservation.ReturnedAt?.ToUniversalTime(),
+                    Status = reservation.Status
+                };
+                dtos.Add(dto);
+            }
+
+            return new PagedList<ReservationReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
 
-        private async Task<int> GetTotalReservationsCountAsync()
+        public async Task<PagedList<ReservationReadDto>> GetPagedReservationsAsync(int pageNumber, int pageSize)
         {
-            int result = await unitOfWork.Reservations.GetTotalReservationsCountAsync();
-            return result;
+            List<Reservation> reservations = await unitOfWork.Reservations.GetPagedReservationsAsync(pageNumber, pageSize);
+            int totalCount = await unitOfWork.Reservations.GetTotalReservationsCountAsync();
+
+            List<ReservationReadDto> dtos = new List<ReservationReadDto>();
+
+            foreach (Reservation reservation in reservations)
+            {
+                ReservationReadDto dto = new ReservationReadDto
+                {
+                    Id = reservation.Id,
+                    UserId = reservation.UserId,
+                    UserFullName = reservation.User.FullName,
+                    BookId = reservation.BookId,
+                    BookTitle = reservation.Book.Title,
+                    ReservedAt = reservation.ReservedAt.ToUniversalTime(),
+                    ReturnedAt = reservation.ReturnedAt?.ToUniversalTime(),
+                    Status = reservation.Status
+                };
+                dtos.Add(dto);
+            }
+
+            return new PagedList<ReservationReadDto>(dtos, totalCount, pageNumber, pageSize);
         }
     }
 }
