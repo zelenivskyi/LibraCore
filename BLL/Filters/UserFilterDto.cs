@@ -11,7 +11,7 @@ namespace BLL.Filters
         public string? FullName { get; set; } 
         public string? PhoneNumber { get; set; }
         public string? Role { get; set; }
-        public string SortBy { get; set; } = "Id";  
+        public string SortBy { get; set; } = "id";  
         public bool SortDescending { get; set; } = false;
     }
 }

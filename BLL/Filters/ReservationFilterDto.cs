@@ -13,8 +13,7 @@ namespace BLL.Filters
         public int? BookId { get; set; }
         public DateTime? ReservedFrom { get; set; }
         public DateTime? ReservedTo { get; set; }
-
-        public string SortBy { get; set; } = "Id";  
+        public string SortBy { get; set; } = "id";  
         public bool SortDescending { get; set; } = false;
     }
 }

@@ -9,8 +9,8 @@ namespace BLL.Filters
     public class AuthorFilterDto
     {
         public string? FullName { get; set; } 
-        public string? Country { get; set; }    
-        public string? SortBy { get; set; }  
+        public string? Country { get; set; }
+        public string? SortBy { get; set; } = "id";
         public bool SortDescending { get; set; } = false;  
     }
 }

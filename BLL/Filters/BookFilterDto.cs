@@ -8,10 +8,10 @@ namespace BLL.Filters
 {
     public class BookFilterDto
     {
-        public string Title { get; set; } = string.Empty;
+        public string? Title { get; set; }
         public int? GenreId { get; set; }
         public int? AuthorId { get; set; }
-        public string SortBy { get; set; } = string.Empty;
+        public string SortBy { get; set; } = "id";
         public bool SortDescending { get; set; } = false;
     }
 }
