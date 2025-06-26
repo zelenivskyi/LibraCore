@@ -20,6 +20,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<LibraCoreDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
@@ -77,15 +86,6 @@ using (var scope = app.Services.CreateScope())
         reservations = SeedReservation.SeedData(dbContext, users, books);
     }
 }
-
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-builder.Services.AddScoped<IAuthorService, AuthorService>();
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services.AddScoped<IGenreService, GenreService>();
-builder.Services.AddScoped<IReservationService, ReservationService>();
-builder.Services.AddScoped<IReviewService, ReviewService>();
-builder.Services.AddScoped<IUserService, UserService>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

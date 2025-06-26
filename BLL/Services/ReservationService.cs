@@ -76,6 +76,8 @@ namespace BLL.Services
 
             await unitOfWork.Reservations.AddAsync(reservation);
             await unitOfWork.SaveChangesAsync();
+            List<Reservation> reservations = await unitOfWork.Reservations.GetAllWithDetailsAsync();
+            reservation = reservations.Last();
 
             ReservationReadDto result = new ReservationReadDto
             {

@@ -77,6 +77,8 @@ namespace BLL.Services
 
             await unitOfWork.Reviews.AddAsync(review);
             await unitOfWork.SaveChangesAsync();
+            List<Review> reviews = await unitOfWork.Reviews.GetAllWithDetails();
+            review = reviews.Last();
 
             ReviewReadDto result = new ReviewReadDto
             {

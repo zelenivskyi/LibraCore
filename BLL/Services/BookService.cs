@@ -167,6 +167,8 @@ namespace BLL.Services
 
             await unitOfWork.Books.AddAsync(book);
             await unitOfWork.SaveChangesAsync();
+            List<Book> books = await unitOfWork.Books.GetAllWithDetailsAsync();
+            book = books.Last();
 
             BookReadDto bookReadDto = new BookReadDto
             {
