@@ -1,11 +1,15 @@
 using System.Linq;
 using BLL.Interfaces;
 using BLL.Services;
+using BLL.Validators.Genre;
 using DAL.DB;
 using DAL.Entities;
 using DAL.SeedData;
 using DAL.UOW;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using BLL.Validators.Author;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +32,9 @@ builder.Services.AddScoped<IGenreService, GenreService>();
 builder.Services.AddScoped<IReservationService, ReservationService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(AuthorCreateDtoValidator).Assembly);
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

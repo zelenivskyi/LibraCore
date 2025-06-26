@@ -105,7 +105,7 @@ namespace BLL.Services
             }
 
             existingReservation.ReturnedAt = dto.ReturnedAt.ToUniversalTime();
-            existingReservation.Status = dto.Status;
+            existingReservation.Status = "Returned";
             unitOfWork.Reservations.Update(existingReservation);
             await unitOfWork.SaveChangesAsync();
 

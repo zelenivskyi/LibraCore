@@ -9,6 +9,5 @@ namespace BLL.DTO.Reservation
     public class ReservationUpdateDto
     {
         public DateTime ReturnedAt { get; set; }
-        public string Status { get; set; }
     }
 }
