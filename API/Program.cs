@@ -1,7 +1,10 @@
 using System.Linq;
+using BLL.Interfaces;
+using BLL.Services;
 using DAL.DB;
 using DAL.Entities;
 using DAL.SeedData;
+using DAL.UOW;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +77,15 @@ using (var scope = app.Services.CreateScope())
         reservations = SeedReservation.SeedData(dbContext, users, books);
     }
 }
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IReservationService, ReservationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

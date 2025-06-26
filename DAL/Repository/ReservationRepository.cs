@@ -7,7 +7,7 @@ using DAL.Entities;
 using DAL.Generic_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Generic_Repository.Implementation
+namespace DAL.Implementation
 {
     public class ReservationRepository : GenericRepository<Reservation>, IReservationRepository
     {
@@ -74,6 +74,15 @@ namespace DAL.Generic_Repository.Implementation
         public async Task<int> GetTotalReservationsCountAsync()
         {
             return await dbSet.CountAsync();
+        }
+
+        public async Task<Reservation?> GetByIdWithDetailsAsync(int id)
+        {
+            return await dbSet
+                .Where(reservation => reservation.Id == id)
+                .Include(reservation => reservation.Book)
+                .Include(reservation => reservation.User)
+                .FirstOrDefaultAsync();
         }
     }
 }

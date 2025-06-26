@@ -7,7 +7,7 @@ using DAL.Entities;
 using DAL.Generic_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Generic_Repository.Implementation
+namespace DAL.Implementation
 {
     public class BookRepository : GenericRepository<Book>, IBookRepository
     {
@@ -67,6 +67,17 @@ namespace DAL.Generic_Repository.Implementation
                 .Include(book => book.Reservations)
                 .Include(book => book.Reviews)
                 .ToListAsync();
+        }
+
+        public async Task<Book?> GetBookByIdWithDetailsAsync(int id)
+        {
+            return await dbSet
+                .Where(book => book.Id == id)
+                .Include(book => book.Author)
+                .Include(book => book.Genre)
+                .Include(book => book.Reservations)
+                .Include(book => book.Reviews)
+                .FirstOrDefaultAsync();
         }
     }
 }

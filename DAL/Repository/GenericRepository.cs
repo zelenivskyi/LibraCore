@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DAL.Generic_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Generic_Repository.Implementation
+namespace DAL.Implementation
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
@@ -19,7 +19,7 @@ namespace DAL.Generic_Repository.Implementation
             dbSet = this.context.Set<T>();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync()
         {
             return await dbSet.ToListAsync();
         }

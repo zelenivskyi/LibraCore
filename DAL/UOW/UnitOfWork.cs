@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DAL.DB;
-using DAL.Generic_Repository.Implementation;
 using DAL.Generic_Repository.Interfaces;
+using DAL.Implementation;
 
 namespace DAL.UOW
 {

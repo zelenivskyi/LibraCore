@@ -7,7 +7,7 @@ using DAL.Entities;
 using DAL.Generic_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace DAL.Generic_Repository.Implementation
+namespace DAL.Implementation
 {
     public class UserRepository : GenericRepository<User>, IUserRepository
     {
