@@ -22,7 +22,7 @@ namespace DAL.Configurations
             builder.HasMany(g => g.Books)
                 .WithOne(b => b.Genre)
                 .HasForeignKey(b => b.GenreId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
