@@ -9,6 +9,7 @@ namespace DAL.Generic_Repository.Interfaces
 {
     public interface IUserRepository : IGenericRepository<User>
     {
+        Task<bool> PhoneNumberExistsAsync(string phoneNumber, int? excludeUserId = null);
         IQueryable<User> GetQueryable();
         Task<List<Reservation>> GetReservationsByUserIdAsync(int userId);
         Task<List<Review>> GetReviewsByUserIdAsync(int userId);

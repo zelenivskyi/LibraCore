@@ -16,6 +16,18 @@ namespace DAL.Implementation
 
         }
 
+        public async Task<bool> PhoneNumberExistsAsync(string phoneNumber, int? excludeUserId = null)
+        {
+            var query = dbSet.Where(u => u.PhoneNumber.ToLower() == phoneNumber.ToLower());
+
+            if (excludeUserId.HasValue)
+            {
+                query = query.Where(u => u.Id != excludeUserId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
+
         public IQueryable<User> GetQueryable()
         {
             return dbSet.AsQueryable();

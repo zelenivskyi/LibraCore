@@ -55,6 +55,11 @@ namespace BLL.Services
 
         public async Task<GenreReadDto> CreateAsync(GenreCreateDto dto)
         {
+            if (await unitOfWork.Genres.NameExistsAsync(dto.Name))
+            {
+                throw new Exception("Genre with the same name already exists.");
+            }
+
             Genre genre = new Genre
             {
                 Name = dto.Name
@@ -73,10 +78,15 @@ namespace BLL.Services
 
         public async Task<GenreReadDto> UpdateAsync(int id, GenreUpdateDto dto)
         {
-            Genre existingGenre = await unitOfWork.Genres.GetByIdAsync(id);
+            Genre? existingGenre = await unitOfWork.Genres.GetByIdAsync(id);
             if (existingGenre == null)
             {
                 return null;
+            }
+
+            if (await unitOfWork.Genres.NameExistsAsync(dto.Name, id))
+            {
+                throw new Exception("Another genre with the same name already exists.");
             }
 
             existingGenre.Name = dto.Name;

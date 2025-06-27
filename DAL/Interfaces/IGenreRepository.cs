@@ -9,6 +9,7 @@ namespace DAL.Generic_Repository.Interfaces
 {
     public interface IGenreRepository : IGenericRepository<Genre>
     {
+        Task<bool> NameExistsAsync(string name, int? excludeGenreId = null);
         Task<Dictionary<string, int>> GetGenresWithBooksCountAsync();
     }
 }

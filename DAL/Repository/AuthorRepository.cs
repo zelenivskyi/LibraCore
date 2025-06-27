@@ -15,6 +15,7 @@ namespace DAL.Implementation
         {
 
         }
+
         public IQueryable<Author> GetQueryable()
         {
             return dbSet.AsQueryable();

@@ -69,6 +69,24 @@ namespace BLL.Services
 
         public async Task<ReservationReadDto> CreateAsync(ReservationCreateDto dto)
         {
+            User? userExists = await unitOfWork.Users.GetByIdAsync(dto.UserId);
+            if (userExists == null)
+            {
+                throw new Exception($"User with id {dto.UserId} does not exist.");
+            }
+
+            Book? bookExists = await unitOfWork.Books.GetByIdAsync(dto.BookId);
+            if (bookExists == null)
+            {
+                throw new Exception($"Book with id {dto.BookId} does not exist.");
+            }
+
+            bool isReserved = await unitOfWork.Reservations.IsBookCurrentlyReservedAsync(dto.BookId);
+            if (isReserved)
+            {
+                throw new Exception("This book is already reserved by another user.");
+            }
+
             Reservation reservation = new Reservation
             {
                 UserId = dto.UserId,

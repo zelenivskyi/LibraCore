@@ -16,6 +16,19 @@ namespace DAL.Implementation
 
         }
 
+        public async Task<bool> NameExistsAsync(string name, int? excludeGenreId = null)
+        {
+            var query = dbSet
+                .Where(g => g.Name.ToLower() == name.ToLower());
+
+            if (excludeGenreId.HasValue)
+            {
+                query = query.Where(g => g.Id != excludeGenreId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
+
         public async Task<Dictionary<string, int>> GetGenresWithBooksCountAsync()
         {
             return await dbSet

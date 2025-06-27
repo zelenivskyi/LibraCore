@@ -63,6 +63,11 @@ namespace BLL.Services
 
         public async Task<UserReadDto> CreateLibrarianAsync(UserCreateDto dto)
         {
+            if (await unitOfWork.Users.PhoneNumberExistsAsync(dto.PhoneNumber))
+            {
+                throw new Exception("Phone number is already in use.");
+            }
+
             User user = new User
             {
                 FullName = dto.FullName,
@@ -92,6 +97,11 @@ namespace BLL.Services
             if (existingUser == null)
             {
                 return null;
+            }
+
+            if (await unitOfWork.Users.PhoneNumberExistsAsync(dto.PhoneNumber, id))
+            {
+                throw new Exception("Phone number is already in use by another user.");
             }
 
             existingUser.FullName = dto.FullName;
@@ -241,6 +251,11 @@ namespace BLL.Services
 
         public async Task<UserReadDto> CreateAdminAsync(UserCreateDto dto)
         {
+            if (await unitOfWork.Users.PhoneNumberExistsAsync(dto.PhoneNumber))
+            {
+                throw new Exception("Phone number is already in use.");
+            }
+
             User user = new User
             {
                 FullName = dto.FullName,

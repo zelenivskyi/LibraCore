@@ -17,6 +17,11 @@ namespace DAL.Implementation
 
         }
 
+        public async Task<bool> ReviewExistsAsync(int userId, int bookId)
+        {
+            return await dbSet.AnyAsync(r => r.UserId == userId && r.BookId == bookId);
+        }
+
         public async Task<List<Review>> GetReviewsByUserIdAsync(int userId)
         {
             return await dbSet

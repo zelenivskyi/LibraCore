@@ -9,6 +9,7 @@ namespace DAL.Generic_Repository.Interfaces
 {
     public interface IReviewRepository : IGenericRepository<Review>
     {
+        Task<bool> ReviewExistsAsync(int userId, int bookId);
         Task<List<Review>> GetAllWithDetails();
         Task<Review> GetByIdWithDetails(int id);
         Task<List<Review>> GetReviewsByUserIdAsync(int userId);

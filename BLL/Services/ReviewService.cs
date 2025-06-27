@@ -66,6 +66,24 @@ namespace BLL.Services
 
         public async Task<ReviewReadDto> CreateAsync(ReviewCreateDto dto)
         {
+            bool reviewExists = await unitOfWork.Reviews.ReviewExistsAsync(dto.UserId, dto.BookId);
+            if (reviewExists)
+            {
+                throw new Exception("User has already submitted a review for this book.");
+            }
+
+            User? userExists = await unitOfWork.Users.GetByIdAsync(dto.UserId);
+            if (userExists == null)
+            {
+                throw new Exception($"User with id {dto.UserId} does not exist.");
+            }
+
+            Book? bookExists = await unitOfWork.Books.GetByIdAsync(dto.BookId);
+            if (bookExists == null)
+            {
+                throw new Exception($"Book with id {dto.BookId} does not exist.");
+            }
+
             Review review = new Review
             {
                 UserId = dto.UserId,
@@ -77,8 +95,7 @@ namespace BLL.Services
 
             await unitOfWork.Reviews.AddAsync(review);
             await unitOfWork.SaveChangesAsync();
-            List<Review> reviews = await unitOfWork.Reviews.GetAllWithDetails();
-            review = reviews.Last();
+            review = await unitOfWork.Reviews.GetByIdWithDetails(review.Id);
 
             ReviewReadDto result = new ReviewReadDto
             {

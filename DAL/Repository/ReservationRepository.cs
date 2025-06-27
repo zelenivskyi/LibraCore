@@ -16,6 +16,14 @@ namespace DAL.Implementation
 
         }
 
+        public async Task<bool> IsBookCurrentlyReservedAsync(int bookId)
+        {
+            return await dbSet.AnyAsync(r => 
+                r.BookId == bookId
+                && r.Status == "Reserved" 
+                && r.ReturnedAt == null);
+        }
+
         public IQueryable<Reservation> GetQueryable()
         {
             return dbSet.Include(r => r.User).Include(r => r.Book).AsQueryable();

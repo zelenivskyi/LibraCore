@@ -15,6 +15,20 @@ namespace DAL.Implementation
         {
 
         }
+        public async Task<bool> TitleAndAuthorExistsAsync(string title, int authorId, int? excludeBookId = null)
+        {
+            var query = dbSet.Where(b =>
+                b.Title.ToLower() == title.ToLower()
+                && b.AuthorId == authorId);
+
+            if (excludeBookId.HasValue)
+            {
+                query = query.Where(b => b.Id != excludeBookId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
+
 
         public IQueryable<Book> GetQueryable()
         {

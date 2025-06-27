@@ -10,6 +10,7 @@ namespace DAL.Generic_Repository.Interfaces
     public interface IReservationRepository : IGenericRepository<Reservation>
     {
         IQueryable<Reservation> GetQueryable();
+        Task<bool> IsBookCurrentlyReservedAsync(int bookId);
         Task<Reservation> GetByIdWithDetailsAsync(int id);
         Task<List<Reservation>> GetReservationsByUserIdAsync(int userId);
         Task<List<Reservation>> GetReservationsByBookIdAsync(int bookId);

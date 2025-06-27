@@ -157,6 +157,23 @@ namespace BLL.Services
 
         public async Task<BookReadDto> CreateAsync(BookCreateDto dto)
         {
+            if (await unitOfWork.Books.TitleAndAuthorExistsAsync(dto.Title, dto.AuthorId))
+            {
+                throw new Exception("Book with the same title and author already exists.");
+            }
+
+            Author? authorExists = await unitOfWork.Authors.GetByIdAsync(dto.AuthorId);
+            if (authorExists == null)
+            {
+                throw new Exception($"Author with id {dto.AuthorId} does not exist.");
+            }
+
+            Genre? genreExists = await unitOfWork.Genres.GetByIdAsync(dto.GenreId);
+            if (genreExists == null)
+            {
+                throw new Exception($"Genre with id {dto.GenreId} does not exist.");
+            }
+
             Book book = new Book
             {
                 Title = dto.Title,
@@ -170,8 +187,7 @@ namespace BLL.Services
 
             await unitOfWork.Books.AddAsync(book);
             await unitOfWork.SaveChangesAsync();
-            List<Book> books = await unitOfWork.Books.GetAllWithDetailsAsync();
-            book = books.Last();
+            book = await unitOfWork.Books.GetBookByIdWithDetailsAsync(book.Id);
 
             BookReadDto bookReadDto = new BookReadDto
             {
@@ -196,6 +212,23 @@ namespace BLL.Services
             if (book == null)
             {
                 throw new Exception("Book not found");
+            }
+
+            if (await unitOfWork.Books.TitleAndAuthorExistsAsync(dto.Title, dto.AuthorId, id))
+            {
+                throw new Exception("Another book with the same title and author already exists.");
+            }
+
+            Author? authorExists = await unitOfWork.Authors.GetByIdAsync(dto.AuthorId);
+            if (authorExists == null)
+            {
+                throw new Exception($"Author with id {dto.AuthorId} does not exist.");
+            }
+
+            Genre? genreExists = await unitOfWork.Genres.GetByIdAsync(dto.GenreId);
+            if (genreExists == null)
+            {
+                throw new Exception($"Genre with id {dto.GenreId} does not exist.");
             }
 
             book.Title = dto.Title;
