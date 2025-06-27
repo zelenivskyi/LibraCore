@@ -36,29 +36,6 @@ namespace API.Controllers
             return Ok(review);
         }
 
-        [HttpGet("by-user/{userId}")]
-        public async Task<ActionResult<List<ReviewReadDto>>> GetByUserId(int userId)
-        {
-            List<ReviewReadDto> reviews = await reviewService.GetReviewsByUserIdAsync(userId);
-            if(reviews.Count == 0)
-            {
-                return Ok(new { message = $"User with ID {userId} doesn`t left any review" });
-            }
-            
-            return Ok(reviews);
-        }
-
-        [HttpGet("by-book/{bookId}")]
-        public async Task<ActionResult<List<ReviewReadDto>>> GetByBookId(int bookId)
-        {
-            List<ReviewReadDto> reviews = await reviewService.GetReviewsByBookIdAsync(bookId);
-            if (reviews.Count == 0)
-            {
-                return Ok(new { message = $"Book with ID {bookId} doesn`t has any review" });
-            }
-
-            return Ok(reviews);
-        }
 
         [HttpGet("average-rating/{bookId}")]
         public async Task<IActionResult> GetAverageRating(int bookId)

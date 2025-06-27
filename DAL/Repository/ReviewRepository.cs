@@ -22,24 +22,6 @@ namespace DAL.Implementation
             return await dbSet.AnyAsync(r => r.UserId == userId && r.BookId == bookId);
         }
 
-        public async Task<List<Review>> GetReviewsByUserIdAsync(int userId)
-        {
-            return await dbSet
-                .Where(review => review.UserId == userId)
-                .Include(review => review.User)
-                .Include(review => review.Book)
-                .ToListAsync();
-        }
-
-        public async Task<List<Review>> GetReviewsByBookIdAsync(int bookId)
-        {
-            return await dbSet
-                .Where(review => review.BookId == bookId)
-                .Include(review => review.User)
-                .Include(review => review.Book)
-                .ToListAsync();
-        }
-
         public async Task<double?> GetAverageRatingByBookIdAsync(int bookId)
         {
             return await dbSet

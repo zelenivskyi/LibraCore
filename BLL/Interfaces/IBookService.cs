@@ -14,8 +14,6 @@ namespace BLL.Interfaces
     {
         Task<BookReadDto> GetByIdAsync(int id);
         Task<List<BookReadDto>> GetAllAsync();
-        Task<List<BookReadDto>> GetBooksByAuthorIdAsync(int authorId);
-        Task<List<BookReadDto>> GetBooksByGenreIdAsync(int genreId);
         Task<List<BookReadDto>> GetLatestBooksAsync(int count);
         Task<PagedList<BookReadDto>> GetPagedBooksAsync(int pageNumber, int pageSize);
         Task<BookReadDto> CreateAsync(BookCreateDto dto);

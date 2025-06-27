@@ -38,43 +38,6 @@ namespace API.Controllers
             return Ok(reservation);
         }
 
-        [HttpGet("by-user/{userId}")]
-        public async Task<ActionResult<List<ReservationReadDto>>> GetByUserId(int userId)
-        {
-            List<ReservationReadDto> reservations = await reservationService.GetReservationsByUserIdAsync(userId);
-            if(reservations.Count == 0)
-            {
-                return Ok(new { message = $"User with ID {userId} doesn`t has any reservation" });
-            }
-
-            return Ok(reservations);
-        }
-
-        [HttpGet("by-book/{bookId}")]
-        public async Task<ActionResult<List<ReservationReadDto>>> GetByBookId(int bookId)
-        {
-            List<ReservationReadDto> reservations = await reservationService.GetReservationsByBookIdAsync(bookId);
-            if (reservations.Count == 0)
-            {
-                return Ok(new { message = $"Book with ID {bookId} doesn`t has any reservation" });
-            }
-
-            return Ok(reservations);
-        }
-
-        [HttpGet("active")]
-        public async Task<ActionResult<List<ReservationReadDto>>> GetActive()
-        {
-            List<ReservationReadDto> reservations = await reservationService.GetActiveReservationsAsync();
-            return Ok(reservations);
-        }
-
-        [HttpGet("completed")]
-        public async Task<ActionResult<List<ReservationReadDto>>> GetCompleted()
-        {
-            List<ReservationReadDto> reservations = await reservationService.GetCompletedReservationsAsync();
-            return Ok(reservations);
-        }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReservationCreateDto dto)

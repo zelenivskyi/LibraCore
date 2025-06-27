@@ -34,23 +34,6 @@ namespace DAL.Implementation
         {
             return dbSet.AsQueryable();
         }
-        public async Task<List<Book>> GetBooksByAuthorIdAsync(int authorId)
-        {
-            return await dbSet
-                .Where(book => book.AuthorId == authorId)
-                .Include(book => book.Author)
-                .Include(book => book.Genre)
-                .ToListAsync();
-        }
-
-        public async Task<List<Book>> GetBooksByGenreIdAsync(int genreId)
-        {
-            return await dbSet
-                .Where(book => book.GenreId == genreId)
-                .Include(book => book.Author)
-                .Include(book => book.Genre)
-                .ToListAsync();
-        }
 
         public async Task<List<Book>> GetLatestBooksAsync(int count)
         {

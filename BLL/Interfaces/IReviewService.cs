@@ -14,8 +14,6 @@ namespace BLL.Interfaces
         Task<ReviewReadDto> CreateAsync(ReviewCreateDto dto);
         Task<ReviewReadDto> UpdateAsync(int id, ReviewUpdateDto dto);
         Task<bool> DeleteAsync(int id);
-        Task<List<ReviewReadDto>> GetReviewsByUserIdAsync(int userId);
-        Task<List<ReviewReadDto>> GetReviewsByBookIdAsync(int bookId);
         Task<double?> GetAverageRatingByBookIdAsync(int bookId);
     }
 }

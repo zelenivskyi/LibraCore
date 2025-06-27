@@ -37,30 +37,6 @@ namespace API.Controllers
             return Ok(book);
         }
 
-        [HttpGet("by-author/{authorId}")]
-        public async Task<ActionResult<List<BookReadDto>>> GetByAuthorId(int authorId)
-        {
-            List<BookReadDto> books = await bookService.GetBooksByAuthorIdAsync(authorId);
-            if(books.Count == 0)
-            {
-                return Ok(new { message = "This author doesn`t have any book" });
-            }
-            
-            return Ok(books);
-        }
-
-        [HttpGet("by-genre/{genreId}")]
-        public async Task<ActionResult<List<BookReadDto>>> GetByGenreId(int genreId)
-        {
-            List<BookReadDto> books = await bookService.GetBooksByGenreIdAsync(genreId);
-            if (books.Count == 0)
-            {
-                return Ok(new { message = "Cannot find any book with this genre ID" });
-            }
-
-            return Ok(books);
-        }
-
         [HttpGet("latest/{count}")]
         public async Task<ActionResult<List<BookReadDto>>> GetLatestBooks(int count)
         {

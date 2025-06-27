@@ -17,10 +17,6 @@ namespace BLL.Interfaces
         Task<ReservationReadDto> UpdateAsync(int id, ReservationUpdateDto dto);
         Task<bool> DeleteAsync(int id);
         Task<PagedList<ReservationReadDto>> GetFilteredReservationsAsync(ReservationFilterDto filterDto, int pageNumber, int pageSize);
-        Task<List<ReservationReadDto>> GetReservationsByUserIdAsync(int userId);
-        Task<List<ReservationReadDto>> GetReservationsByBookIdAsync(int bookId);
-        Task<List<ReservationReadDto>> GetActiveReservationsAsync();
-        Task<List<ReservationReadDto>> GetCompletedReservationsAsync();
         Task<PagedList<ReservationReadDto>> GetPagedReservationsAsync(int pageNumber, int pageSize);
     }
 }

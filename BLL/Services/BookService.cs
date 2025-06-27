@@ -74,60 +74,6 @@ namespace BLL.Services
             return result;
         }
 
-        public async Task<List<BookReadDto>> GetBooksByAuthorIdAsync(int authorId)
-        {
-            List<Book> books = await unitOfWork.Books.GetBooksByAuthorIdAsync(authorId);
-            List<BookReadDto> result = new List<BookReadDto>();
-            
-            foreach (Book book in books)
-            {
-                BookReadDto dto = new BookReadDto
-                {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Description = book.Description,
-                    PublishedDate = book.PublishedDate.ToUniversalTime(),
-                    Pages = book.Pages,
-                    Photo = book.Photo,
-                    GenreId = book.GenreId,
-                    GenreName = book.Genre.Name,
-                    AuthorId = book.AuthorId,
-                    AuthorName = book.Author.FullName
-                };
-
-                result.Add(dto);
-            }
-
-            return result;
-        }
-
-        public async Task<List<BookReadDto>> GetBooksByGenreIdAsync(int genreId)
-        {
-            List<Book> books = await unitOfWork.Books.GetBooksByGenreIdAsync(genreId);
-            List<BookReadDto> result = new List<BookReadDto>();
-            
-            foreach (Book book in books)
-            {
-                BookReadDto dto = new BookReadDto
-                {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Description = book.Description,
-                    PublishedDate = book.PublishedDate.ToUniversalTime(),
-                    Pages = book.Pages,
-                    Photo = book.Photo,
-                    GenreId = book.GenreId,
-                    GenreName = book.Genre.Name,
-                    AuthorId = book.AuthorId,
-                    AuthorName = book.Author.FullName
-                };
-
-                result.Add(dto);
-            }
-
-            return result;
-        }
-
         public async Task<List<BookReadDto>> GetLatestBooksAsync(int count)
         {
             List<Book> books = await unitOfWork.Books.GetLatestBooksAsync(count);

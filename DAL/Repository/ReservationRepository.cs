@@ -28,41 +28,6 @@ namespace DAL.Implementation
         {
             return dbSet.Include(r => r.User).Include(r => r.Book).AsQueryable();
         }
-        public async Task<List<Reservation>> GetReservationsByUserIdAsync(int userId)
-        {
-            return await dbSet
-                .Where(reservation => reservation.UserId == userId)
-                .Include(reservation => reservation.Book)
-                .Include(reservation => reservation.User)
-                .ToListAsync();
-        }
-
-        public async Task<List<Reservation>> GetReservationsByBookIdAsync(int bookId)
-        {
-            return await dbSet
-                .Where(reservation => reservation.BookId == bookId)
-                .Include(reservation => reservation.Book)
-                .Include(reservation => reservation.User)
-                .ToListAsync();
-        }
-
-        public async Task<List<Reservation>> GetActiveReservationsAsync()
-        {
-            return await dbSet
-                .Where(reservation => reservation.ReturnedAt == null && reservation.Status == "Reserved")
-                .Include(reservation => reservation.Book)
-                .Include(reservation => reservation.User)
-                .ToListAsync();
-        }
-
-        public async Task<List<Reservation>> GetCompletedReservationsAsync()
-        {
-            return await dbSet
-                .Where(reservation => reservation.ReturnedAt != null || reservation.Status == "Returned")
-                .Include(reservation => reservation.Book)
-                .Include(reservation => reservation.User)
-                .ToListAsync();
-        }
 
         public async Task<List<Reservation>> GetAllWithDetailsAsync()
         {

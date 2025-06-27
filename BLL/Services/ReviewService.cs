@@ -152,52 +152,6 @@ namespace BLL.Services
             return true;
         }
 
-        public async Task<List<ReviewReadDto>> GetReviewsByUserIdAsync(int userId)
-        {
-            List<Review> reviews = await unitOfWork.Reviews.GetReviewsByUserIdAsync(userId);
-            List<ReviewReadDto> result = new List<ReviewReadDto>();
-
-            foreach (Review review in reviews)
-            {
-                ReviewReadDto readDto = new ReviewReadDto
-                {
-                    Id = review.Id,
-                    UserId = review.UserId,
-                    UserFullName = review.User.FullName,
-                    BookId = review.BookId,
-                    BookTitle = review.Book.Title,
-                    Rating = review.Rating,
-                    Comment = review.Comment,
-                    CreatedAt = review.CreatedAt.ToUniversalTime()
-                };
-                result.Add(readDto);
-            }
-            return result;
-        }
-
-        public async Task<List<ReviewReadDto>> GetReviewsByBookIdAsync(int bookId)
-        {
-            List<Review> reviews = await unitOfWork.Reviews.GetReviewsByBookIdAsync(bookId);
-            List<ReviewReadDto> result = new List<ReviewReadDto>();
-
-            foreach (Review review in reviews)
-            {
-                ReviewReadDto readDto = new ReviewReadDto
-                {
-                    Id = review.Id,
-                    UserId = review.UserId,
-                    UserFullName = review.User.FullName,
-                    BookId = review.BookId,
-                    BookTitle = review.Book.Title,
-                    Rating = review.Rating,
-                    Comment = review.Comment,
-                    CreatedAt = review.CreatedAt.ToUniversalTime()
-                };
-                result.Add(readDto);
-            }
-            return result;
-        }
-
         public async Task<double?> GetAverageRatingByBookIdAsync(int bookId)
         {
             double? result = await unitOfWork.Reviews.GetAverageRatingByBookIdAsync(bookId);
