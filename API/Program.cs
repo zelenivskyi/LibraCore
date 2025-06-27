@@ -10,6 +10,7 @@ using FluentValidation.AspNetCore;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using BLL.Validators.Author;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +38,8 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(AuthorCreateDtoValidator).Assembly);
 
 var app = builder.Build();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
+
 using (var scope = app.Services.CreateScope())
 {
     List<Author> authors = new List<Author>();
